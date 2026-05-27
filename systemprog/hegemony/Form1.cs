@@ -10,7 +10,7 @@ namespace hegemony
         {
             InitializeComponent();
 
-            // Enter key triggers copy
+// so enter triggers copy V
             this.AcceptButton = btnCopy;
         }
 
@@ -34,26 +34,28 @@ namespace hegemony
             }
         }
 
-        private void btnCopy_Click(object sender, EventArgs e)
+        private async void btnCopy_Click(object sender, EventArgs e)
         {
             try
             {
                 string sourceFile = txtFrom.Text;
-
+            
                 string destinationFolder = txtTo.Text;
-
+            
                 string fileName = Path.GetFileName(sourceFile);
-
-                string destinationPath = Path.Combine(destinationFolder, fileName);
-
-                File.Copy(sourceFile, destinationPath, true);
-
-                MessageBox.Show(
-                    "File copied successfully!",
-                    "Success",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information
-                );
+            
+                string destinationPath =
+                    Path.Combine(destinationFolder, fileName);
+            
+                using (FileStream sourceStream = new FileStream(sourceFile, FileMode.Open, FileAccess.Read))
+                {
+                    using (FileStream destinationStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write))
+                    {
+                        await sourceStream.CopyToAsync(destinationStream);
+                    }
+                }
+            
+                MessageBox.Show("File copied successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
